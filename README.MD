@@ -4,10 +4,18 @@
 <img src="https://typonotes.com/mp/qrcode.png" width="800px" />
 
 
-## Todo
+## Tips
 
 
-+ [x] 1. 使用 Otel-Collect-Contrib 初始化 trace.Provider
+### 1. 使用 Otel-Collect-Contrib 初始化 trace.Provider
+
+这里使用 `app -> collector-contrib`  进行转发， 应用不直接对后端的存储。 **适配性** 更高。
+
+![](./docs/img/app-collector-display.jpg)
+
+
+`collector-contrib` 最常见的两种协议 `grpc / http(s)`。 传入 endpoint 地址进行初始化 Provider， [代码参考](./pkg/middlewares/otel/provider.go#41)
+
 
 ### 2. 使用 Otelgin 接入 TraceProvider
 
