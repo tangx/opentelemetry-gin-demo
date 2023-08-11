@@ -6,10 +6,33 @@
 
 ## Todo
 
+
 + [x] 1. 使用 Otel-Collect-Contrib 初始化 trace.Provider
+
+### 2. 使用 Otelgin 接入 TraceProvider
+
 + [x] 2. 使用 otelgin 接入 trace.Provider
+
+1. 在 gin 已经实现了一个官方的 Middleware 支持 OpenTelemetry.  参考代码 [gin-gonic/gin/otelgin](https://github.com/open-telemetry/opentelemetry-go-contrib/blob/849072ef827b4abab754253e1e63e7b410a31084/instrumentation/github.com/gin-gonic/gin/otelgin/gintrace.go#L42)
+
+2. 第一步初始化好的 trace.Provider 需要通过 Option 的方式传入, 参考代码 [otel middleware option](./pkg/middlewares/otel/register.go#L8)
+
+3. 
+
+
+### 3. 完成单服务的 Trace 树状结构
+
 + [x] 3. 完成单服务的 Trace 树状结构
+
+在使用的时候， 需要使用 Context 在不同的 **函数/方法** 之间传递 Provider。 每个 **函数/方法** 创建自己的 **Span**， 以此实现 **调用的父子关系**。
+
+
+
+
+### [x] 4. 应答客户端时， 在 Header 中默认添加 TraceID
 + [x] 4. 应答客户端时， 在 Header 中默认添加 TraceID
+
+
 + [x] 5. 获取前方传递的 traceparent 信息
     1. 使用 `otelgin.WithPropagators(pptc)`
 + [x] 6. 向后传递 Header: traceparent
