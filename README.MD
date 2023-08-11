@@ -14,7 +14,7 @@
 ![](./docs/img/app-collector-display.jpg)
 
 
-`collector-contrib` 最常见的两种协议 `grpc / http(s)`。 传入 endpoint 地址进行初始化 Provider， [代码参考](./pkg/middlewares/otel/provider.go#41)
+`collector-contrib` 最常见的两种协议 `grpc / http(s)`。 传入 endpoint 地址进行初始化 Provider， 参考代码 [grpcExporter 和 httpExporter](./pkg/middlewares/otel/provider.go#41)
 
 
 ### 2. 使用 Otelgin 接入 TraceProvider
