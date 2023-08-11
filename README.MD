@@ -1,6 +1,9 @@
 # Srv-webapp-demo: App1 OpenTelemetry Demo
 
 
+<img src="https://typonotes.com/mp/qrcode.png" width="500px" />
+
+
 ## Todo
 
 + [x] 1. 使用 Otel-Collect-Contrib 初始化 trace.Provider
