@@ -1,0 +1,17 @@
+
+### GET
+GET http://127.0.0.1:3000/api/v1/user/info
+UserName: zhangfei
+# traceparent: 00-0cf7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01
+# tracestate: congo=congosSecondPosition,rojo=rojosFirstPosition,vendorname1=opaqueValue1,vendorname2=opaqueValue2
+
+
+
+
+### GET user info from App1 
+GET http://127.0.0.1:3000/api/v1/app1/info
+UserName: guanyu
+
+
+### GET balance
+GET http://127.0.0.1:3000/api/v1/app2/balance
