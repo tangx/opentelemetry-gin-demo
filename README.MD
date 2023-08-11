@@ -38,11 +38,17 @@
 
 在使用的时候， 需要使用 Context 在不同的 **函数/方法** 之间传递 Provider。 每个 **函数/方法** 创建自己的 **Span**， 以此实现 **调用的父子关系**。
 
+1. 在 [utils/span.go](./pkg/utils/span.go) 中， 封装了一个函数 `Span(xxxx)` 提出 context 中的 provider 并启动 `tracer.Start(xxx)`。
 
+在 **#L21** 中， 对 `ctx` 进行了判断， 如果 ctx 是 `gin.Context` 的话， 就需要从 Request 中携带的 context， 这一点在上诉的 **2.4.** 中已经说明原因。
+
+额外的进行了一些 **公共属性** 的设置， 例如运行的主机名。
+
+
+2. 在 [apis/user/info.go](./pkg/apis/user/info.go) 中， 通过 context 在不同 **函数/方法** 之间传递 tracer provider， 每个地方都调用了 `Span(xxx)` 跟踪当前情况。
 
 
 ### [x] 4. 应答客户端时， 在 Header 中默认添加 TraceID
-+ [x] 4. 应答客户端时， 在 Header 中默认添加 TraceID
 
 
 + [x] 5. 获取前方传递的 traceparent 信息
