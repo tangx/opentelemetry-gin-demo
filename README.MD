@@ -1,7 +1,7 @@
 # Srv-webapp-demo: App1 OpenTelemetry Demo
 
 
-<img src="https://typonotes.com/mp/qrcode.png" width="500px" />
+<img src="https://typonotes.com/mp/qrcode.png" width="800px" />
 
 
 ## Todo
