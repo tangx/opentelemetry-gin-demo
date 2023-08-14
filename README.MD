@@ -48,25 +48,54 @@
 2. 在 [apis/user/info.go](./pkg/apis/user/info.go) 中， 通过 context 在不同 **函数/方法** 之间传递 tracer provider， 每个地方都调用了 `Span(xxx)` 跟踪当前情况。
 
 
-### [x] 4. 应答客户端时， 在 Header 中默认添加 TraceID
+### 4. 应答客户端时， 在 Header 中默认添加 TraceID
+
+当有需求的时候（例如出现访问错误）， 需要把 TraceID 返回给用户。 这样用户在报错的时候提供 TraceID 可以快速 debug。
+
+![](./docs/img/propagation.jpg)
+
+在 [otel/response_traceid.go](./pkg/middlewares/otel/response_traceid.go) 创建了一个 Gin Middleware， 将 TraceID 从 Context 中提取出来， 并放到 Response Header 中。
+
+其中用到了 `propagation` 标准库， 简单快捷。
 
 
-+ [x] 5. 获取前方传递的 traceparent 信息
-    1. 使用 `otelgin.WithPropagators(pptc)`
-+ [x] 6. 向后传递 Header: traceparent
-    1. **这个应该从 context 中获取** 并 **添加到 HTTP Client 请求的 Header** 中。
-    2. 而非 **添加到 Response Header** 中。
-+ [x] 7. 在 Trace 中添加 Error Log, Status, Attr
-    1. `span.RecordError` 提交错误日志
-    2. `span.SetStatus` 设置 trace span 状态。 氛围 error 和 ok
-    3. `span.SetAttributes` 设置属性，可以通过属性搜索。 (所有属性被 **索引**)。
-+ [x] 8. 修改 Trace 中的 Kind 类型。 已知 Otelngin 提供的值为 Sever， 默认的值为 internal
-    1. (*) Kind 是标准字段， 是枚举类型。 其中包含 `internal, server, client, producer, consumer` 可以在代码中看到。 
-    2. 可以通过 `trace.WithSpanKind`， 在 `trace.Start` 时作为 opt 传入。 之后不能通过 span 设置。
-+ [x] 9. 添加自定义属性字段
-    1. (*) 自定义字段(Attribute)（类似 host）.
-    2. 每个 span 都是独立的。 因此 public attributes 需要在公共函数中注入 [utils/span.go](/pkg/utils/span.go#L27)
-    3. 因此使用 Context 进行传递， 在不同的 方法/函数 内进行公共 attr 共享。
+### 5. 获取前方传递的 traceparent 信息
+
+在上图 App2 中， 能够拿到 App 传递的 Traceparent header， 这样就保证了接收侧的 TraceID 连贯性。
+
+1. 在 `otelgin` 中， 提供了一个 Option 注入， [otel/propagation](./pkg/middlewares/otel/propagation.go), 使用 `otelgin.WithPropagators(pptc)`
+2. 在 gin 中注册 provider 的时候， 使用 Option 即可, [otel/register.go#L12](./pkg/middlewares/otel/register.go#L12)
+
+### 6. 向后传递 Header: traceparent
+
+为了保证 TraceID 的连贯性， 除了接收侧（App2）。 在 **发送侧 App1** 也需要做对应的操作。
+
+从 Context 中读取 TraceParent 并注入到 HTTP Request Header 中。 
+
+1. 在 [utils/carrier.go#L9](./pkg/utils/carrier.go) 中， 通过 `propagation` 标准库将 Header 字段找出来。
+2. 在 [httpclient/client.go#L19](./pkg/httpclient/client.go#L19) 中， 将找到的 Header 字段全部放到新创建的 Request Header 中。
+
+### 7. 在 Trace 中添加 Error Log, Status, Attr
+
+标准 API 用法。 
+
+1. `span.RecordError` 提交错误日志
+2. `span.SetStatus` 设置 trace span 状态。 氛围 error 和 ok
+3. `span.SetAttributes` 设置属性，可以通过属性搜索。 (所有属性被 **索引**)。
+
+
+### 8. 修改 Trace 中的 Kind 类型。 已知 Otelngin 提供的值为 Sever， 默认的值为 internal
+
+在 Tracer 启动的时候传入。 启动之后 Span 不能设置。 可以通过 **Kind** 类型， 表明当前步骤类型， 以后在 **检索/查询** 的时候更直观。
+
+1. (*) Kind 是标准字段， 是枚举类型。 其中包含 `internal, server, client, producer, consumer` 可以在代码中看到。 
+2. 可以通过 `trace.WithSpanKind`， 在 `trace.Start` 时作为 opt 传入。 之后不能通过 span 设置。
+
+### 9. 添加自定义属性字段
+
+1. (*) 自定义字段(Attribute)（类似 host）.
+2. 每个 span 都是独立的。 因此 public attributes 需要在公共函数中注入 [utils/span.go](/pkg/utils/span.go#L27)
+3. 因此使用 Context 进行传递， 在不同的 方法/函数 内进行公共 attr 共享。 **（看自己情况实现）**
 
 
 ## Todo2: Request Tree
