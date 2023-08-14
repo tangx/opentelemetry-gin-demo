@@ -1,4 +1,4 @@
-# Srv-webapp-demo: App1 OpenTelemetry Demo
+# Go 集成 OpenTelemetry 笔记： （Gin Demo）
 
 
 <img src="https://typonotes.com/mp/qrcode.png" width="800px" />
